@@ -1,17 +1,40 @@
-name: C/C++ CI
+name: Build with NMake
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    branches: [ main ]
 
 jobs:
   build:
-
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: make
-      run: nmake
+      - uses: actions/checkout@v3
+
+      - name: Download VS Build Tools installer
+        run: |
+          Invoke-WebRequest -Uri https://aka.ms/vs/17/release/vs_buildtools.exe -OutFile vs_buildtools.exe
+
+      - name: Install VS Build Tools with VC++ workload (includes NMake)
+        run: |
+          .\vs_buildtools.exe --quiet --wait --norestart --nocache `
+            --installPath C:\BuildTools `
+            --add Microsoft.VisualStudio.Workload.VCTools `
+            --includeRecommended
+
+      - name: Set environment variables for MSVC tools
+        shell: powershell
+        run: |
+          $vcvars = "C:\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
+          if (Test-Path $vcvars) {
+            Write-Host "##vso[task.setvariable variable=VCVARS_PATH]$vcvars"
+          } else {
+            Write-Error "vcvars64.bat not found!"
+            exit 1
+          }
+
+      - name: Run NMake
+        shell: cmd
+        run: |
+          call "%VCVARS_PATH%"
+          nmake /version
