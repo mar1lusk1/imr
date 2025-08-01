@@ -1,0 +1,7 @@
+imr -- install more ram
+***********************
+
+imr is a simple Windows utility program that sets the pagefile size, essentially giving you (extremely slow) RAM.
+
+It includes a GUI that must be ran as administrator.
+

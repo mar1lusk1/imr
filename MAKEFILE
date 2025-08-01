@@ -1,0 +1,19 @@
+TARGET = IMR.EXE
+SRC = IMR.C
+OBJS = $(SRC:.c=.obj)
+
+CC = cl
+CFLAGS = /nologo /W4 /DUNICODE /D_UNICODE
+LFLAGS = /link /nologo /subsystem:windows user32.lib advapi32.lib comctl32.lib
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(OBJS) $(LFLAGS)
+
+.c.obj:
+	$(CC) $(CFLAGS) /c $<
+
+clean:
+	del /f /q *.obj *.exe
+
